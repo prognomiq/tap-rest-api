@@ -1,3 +1,4 @@
+import re
 import attr, backoff, dateutil, datetime, hashlib, os, requests
 import simplejson as json
 from urllib.parse import quote as urlquote
@@ -78,6 +79,11 @@ def get_record_list(raw_data, record_list_level):
     """
     if not record_list_level:
         return raw_data
+
+    record_list_field = re.sub(r'\W.*$', '', record_list_level) # ex: features[*] -> features
+    if record_list_field not in raw_data:
+        raise ValueError(f"'{record_list_field}' field not found in: {raw_data}")
+
     data = _get_jsonpath(raw_data, record_list_level)
     return data
 
